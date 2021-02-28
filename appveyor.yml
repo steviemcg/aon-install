@@ -3,10 +3,11 @@ image: Visual Studio 2019
 configuration: Release
 shallow_clone: true
 clone_depth: 1
-nuget:
-  account_feed: true
 test: off
+services:
+- iis
+- mssql2017
 build_script:
 - ps: .\build.ps1 -DownloadBase $Env:DownloadBase
 on_failure:
-- ps: '#$blockRdp = $true; iex ((new-object net.webclient).DownloadString(''https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1''))'
+- ps: '$blockRdp = $true; iex ((new-object net.webclient).DownloadString(''https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1''))'

@@ -4,7 +4,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-Import-Module ParTech.SimpleInstallScripts
+Install-Module ParTech.SimpleInstallScripts
 
 Install-Sitecore91 -Prefix cfpa `
 				  -SitecoreVersion 910XP0 `
