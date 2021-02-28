@@ -5,6 +5,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 Enable-WindowsOptionalFeature -featurename IIS-WebServerRole -all -online
+Get-WindowsOptionalFeature -Online
+
 #Enable-WindowsOptionalFeature –FeatureName "name" -All -Online
 
 Install-Module ParTech.SimpleInstallScripts
