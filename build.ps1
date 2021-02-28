@@ -4,6 +4,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+Enable-WindowsOptionalFeature -featurename IIS-WebServerRole -all -online
+#Enable-WindowsOptionalFeature –FeatureName "name" -All -Online
+
 Install-Module ParTech.SimpleInstallScripts
 
 Install-Sitecore91 -Prefix cfpa `
