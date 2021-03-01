@@ -8,9 +8,10 @@ Enable-WindowsOptionalFeature -featurename IIS-WebServerRole -all -online
 
 Install-Module ParTech.SimpleInstallScripts
 
+# 	"Sitecore.PowerShell.Extensions-6.2.zip"
+# 	"Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.zip"
+
 $packages = @(
-	"Sitecore.PowerShell.Extensions-6.2.zip"
-	"Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.zip"
 	"Sitecore JavaScript Services Server for Sitecore 9.1 XP 11.0.0 rev. 181031.zip",
 	"Templates backup-20210301.zip"
 	"Content backup-20210301.zip"
@@ -29,6 +30,7 @@ Install-Sitecore91 -Prefix cfpa `
 				  -SqlAdminUser sa `
 				  -SqlAdminPassword 'Password12!' `
 				  -DoInstallPrerequisites `
+				  -SitecoreAdminPassword b `
 				  -Packages $packages `
 				  -DoSitecorePublish
 				  -DoRebuildLinkDatabases `
