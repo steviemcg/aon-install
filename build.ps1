@@ -1,38 +1,117 @@
 param(
-    [Parameter(Mandatory)] [string] $DownloadBase
+    [Parameter(Mandatory)] [string] $DownloadBase,
+	[Parameter(Mandatory)] [string] $BizTalkAon,
+	[Parameter(Mandatory)] [string] $BizTalkForms,
+	[Parameter(Mandatory)] [string] $IakCfpPassword
 )
 
 $ErrorActionPreference = "Stop"
 
-Enable-WindowsOptionalFeature -featurename IIS-WebServerRole -all -online
-
-Install-Module ParTech.SimpleInstallScripts
-
-# 	"Sitecore.PowerShell.Extensions-6.2.zip"
-# 	"Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.zip"
+$sourceFolder = "C:\eglobal_au\Dev\aon-sitecore\code\sitecore\src"
+$installRoot = "C:\downloads\910XP0"
+$prefix = "cfpa"
+$SitecorePath = "C:\\eBusiness\\sites\\$prefix.local"
+$XConnectPath = "C:\\eBusiness\\sites\\$prefix.xconnect.local"
+$DevSettingsFile = "$PSScriptRoot\DevSettings.config"
+$SitecoreBuild = "1.30.0.205"
+$FrontendSitecoreBuild = "1.1.0-281"
 
 $packages = @(
-	"Sitecore JavaScript Services Server for Sitecore 9.1 XP 11.0.0 rev. 181031.zip",
-	"Templates backup-20210301.zip"
-	"Content backup-20210301.zip"
-	"Media backup-20210301.zip"
+    "Sitecore JavaScript Services Server for Sitecore 9.1 XP 11.0.0 rev. 181031.zip"
+    "Sitecore.PowerShell.Extensions-6.2.zip"
+	"Templates backup 2021-03-31.zip"
+    "Content backup 2021-03-31.zip"
+    "Media backup 2021-03-31.zip"
 )
 
-# files
-# auditlog
-# dist/aon_app
-# connectionstrings adjustment
+$zips = @(
+    "9.1.0 Hotfixes.zip"
+	"razl.zip"
+)
+		
+Write-Host "================= Downloading files =================" -foregroundcolor Magenta
+$filesToDownload = $packages + $zips + @("cfpa.sitecore.react.$($SitecoreBuild).zip", "XConnectFiles.zip", "aon-front-end-sitecore.$($FrontendSitecoreBuild).tgz", "cfpa.sitecore.dotnet.$($SitecoreBuild).zip")
 
-Install-Sitecore91 -Prefix cfpa `
-				  -SitecoreVersion 910XP0 `
-				  -DownloadBase $DownloadBase `
-				  -SqlServer . `
-				  -SqlAdminUser sa `
-				  -SqlAdminPassword 'Password12!' `
-				  -DoInstallPrerequisites `
-				  -SitecoreAdminPassword b `
-				  -Packages $packages `
-				  -DoSitecorePublish
-				  -DoRebuildLinkDatabases `
-				  -DoRebuildSearchIndexes `
-				  -DoDeployMarketingDefinitions
+foreach ($fileName in $filesToDownload) {
+	Write-Host "================= Downloading $fileName =================" -foregroundcolor Yellow
+	$FileUrl = "$DownloadBase/$fileName"
+	$FilePath = "$($installRoot)\$fileName"
+	Invoke-DownloadIfNeeded $FileUrl $FilePath
+}
+
+$ConnectionStrings = @{
+    "session" = "localhost:6379"
+    "bizTalkAon" = $BizTalkAon
+    "bizTalkForms" = $BizTalkForms
+    "SiteTransferServiceCert" = "B066A86A7D929DE78800C0C67BB7975BC7AD6398"
+    "HouseInfoUrl" = "http://adres.dev.aon.nl/AdresGegevens/gethouseinfo"
+    "ZorgWebUrl" = "BaseUrl=https://ws-test.z-advies.nl/apps/rest/AON_OneUnderwritingjs/sessiedata/{guid};username=;password=;useProxy=false"
+}
+
+Write-Host "================= Checking Redis installed =================" -foregroundcolor Magenta
+$redis = Test-NetConnection -ComputerName 127.0.0.1 -Port 6379
+if (-Not $redis.TcpTestSucceeded) {
+    throw "Please install Redis first. G:\ECOMM.AFD\CFP\Developer Workstation Tools"
+}
+
+Write-Host "================= Enabling IIS features =================" -foregroundcolor Magenta
+#Enable-WindowsOptionalFeature -featurename IIS-WebServerRole -all -online
+
+Write-Host "================= Installing SSL certificates =================" -foregroundcolor Magenta
+Import-Certificate -FilePath "$PSScriptRoot\OneGini-TST.cer" -CertStoreLocation Cert:\LocalMachine\My
+Import-Certificate -FilePath "$PSScriptRoot\NAM-qc.cer" -CertStoreLocation Cert:\LocalMachine\My
+
+$IakCfpPasswordSecure = ConvertTo-SecureString $IakCfpPassword -AsPlainText -Force
+Import-PfxCertificate -FilePath "$PSScriptRoot\iakcfp.pfx" -CertStoreLocation Cert:\LocalMachine\My -Password $IakCfpPasswordSecure
+
+Write-Host "================= Installing ParTech.SimpleInstallScripts =================" -foregroundcolor Magenta
+#Install-Module ParTech.SimpleInstallScripts
+
+Invoke-SetXmlTask -FilePath $DevSettingsFile -XPath "//sitecore/sc.variable[@name='sourceFolder']" -Attributes @{value=$sourceFolder}
+
+# path sxa cores
+# publishingsettings.targets.user
+
+Install-Sitecore91 -Prefix $prefix `
+                -Parameters @{Path=".\\aon.json"; SitecoreSiteName="$prefix.local"; SitecorePath=$SitecorePath; SitecoreSchema="https"; DevSettingsFile=$DevSettingsFile; InstallRoot=$installRoot } `
+                -SitecoreVersion 910XP0 `
+                -DownloadBase $DownloadBase `
+                -SqlServer . `
+                -SqlAdminUser sa `
+                -SqlAdminPassword 'Blank123' `
+                -SitecoreAdminPassword b `
+                -Packages $packages `
+                -Zips $zips `
+                -ConnectionStrings $ConnectionStrings `
+                -DoUninstall:$false `
+                -DoInstallPrerequisites:$false `
+                -DoSitecorePublish:$false `
+                -DoRebuildLinkDatabases:$true `
+                -DoRebuildSearchIndexes:$true `
+                -DoDeployMarketingDefinitions:$true
+
+Write-Host "================= Extracting CFP Sitecore solution =================" -foregroundcolor Magenta
+Expand-Archive -Path "$installRoot\cfpa.sitecore.dotnet.$($SitecoreBuild).zip" -DestinationPath $SitecorePath -Force
+& ".\slowcheetah.xdt.exe" "$SitecorePath\web.config" "$sourceFolder\Website\Web.Local.config" "$SitecorePath\web.config"
+
+Write-Host "================= Extracting JavaScript SSR app =================" -foregroundcolor Magenta
+New-Item "$SitecorePath\dist" -ItemType Directory -Force
+tar -zxf "$installRoot\aon-front-end-sitecore.$($FrontendSitecoreBuild).tgz"
+Move-Item "$PSScriptRoot\package" "$SitecorePath\dist\aon_app"
+
+Write-Host "================= Extracting AuditLog app =================" -foregroundcolor Magenta
+New-Item "$SitecorePath\sitecore\cfpa\auditlog" -ItemType Directory -Force
+Expand-Archive -Path "$installRoot\cfpa.sitecore.react.$($SitecoreBuild).zip" -DestinationPath "$SitecorePath\sitecore\cfpa\auditlog" -Force
+
+Write-Host "================= Extracting XConnect files =================" -foregroundcolor Magenta
+Expand-Archive -Path "$installRoot\XconnectFiles.zip" -DestinationPath $XConnectPath -Force
+
+Test-Site "https://$prefix.local"
+
+Write-Host "================= Running Unicorn =================" -foregroundcolor Magenta
+Add-Type -Path "$SitecorePath\bin\MicroCHAP.dll"
+Import-Module $PSScriptRoot\Unicorn.psm1 -Force
+Sync-Unicorn -ControlPanelUrl "https://$prefix.local/unicorn.aspx" -SharedSecret 'B117AA7E8140B7B3C106FBE16D5DB8FDAA2F4F04EA175B251D22B8FB23A7891D' -StreamLogs
+
+Test-Site "https://$prefix.local"
+Write-Host "Done!" -foregroundcolor Green
