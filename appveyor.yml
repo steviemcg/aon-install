@@ -7,6 +7,7 @@ test: off
 services:
 - iis
 - mssql2017
+- redis
 build_script:
 - ps: .\build.ps1 -DownloadBase $Env:DownloadBase -BizTalkAon $Env:BizTalkAon -BizTalkForms $Env:BizTalkForms -IakCfpPassword $Env:IakCfpPassword
 on_failure:

@@ -34,6 +34,8 @@ $zips = @(
 Write-Host "================= Installing ParTech.SimpleInstallScripts =================" -foregroundcolor Magenta
 Import-Module "$PSScriptRoot\ParTech.SimpleInstallScripts.psd1" -Force
 
+Write-Host "DownloadBase: $DownloadBase"
+
 Write-Host "================= Downloading files =================" -foregroundcolor Magenta
 $filesToDownload = $packages + $zips + @("cfpa.sitecore.react.$($SitecoreBuild).zip", "XConnectFiles.zip", "aon-front-end-sitecore.$($FrontendSitecoreBuild).tgz", "cfpa.sitecore.dotnet.$($SitecoreBuild).zip")
 
