@@ -67,11 +67,11 @@ $IakCfpPasswordSecure = ConvertTo-SecureString $IakCfpPassword -AsPlainText -For
 Import-PfxCertificate -FilePath "$PSScriptRoot\iakcfp.pfx" -CertStoreLocation Cert:\LocalMachine\My -Password $IakCfpPasswordSecure
 
 Write-Host "================= Installing ParTech.SimpleInstallScripts =================" -foregroundcolor Magenta
-#Install-Module ParTech.SimpleInstallScripts
+Import-Module "$PSScriptRoot\ParTech.SimpleInstallScripts.psd1" -Force
 
 Invoke-SetXmlTask -FilePath $DevSettingsFile -XPath "//sitecore/sc.variable[@name='sourceFolder']" -Attributes @{value=$sourceFolder}
 
-# publishingsettings.targets.user
+# TODO: publishingsettings.targets.user
 
 Install-Sitecore91 -Prefix $prefix `
                 -Parameters @{Path=".\\aon.json"; SitecoreSiteName="$prefix.local"; SitecorePath=$SitecorePath; SitecoreSchema="https"; DevSettingsFile=$DevSettingsFile; InstallRoot=$installRoot } `
