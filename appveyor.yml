@@ -1,55 +1,13 @@
-version: 0.0.{build}
-skip_branch_with_pr: true
-image: Visual Studio 2017
-matrix:
-  fast_finish: false
-environment:
-  DownloadBase:
-    secure: tvDdT2DZMOgijvJd0Pvmuic+soMCi6cNrh+ndejvp0gb6vCTKWp3tbXNmoUi5kjzpdTZetFLWNKDuim/FJ0aVw==
-  matrix:
-  - SitecoreVersion: 910XM0
-    InstallCommand: Install-Sitecore91
-  - SitecoreVersion: 910XM1
-    InstallCommand: Install-Sitecore91
-  - SitecoreVersion: 910XP0
-    InstallCommand: Install-Sitecore91
-  - SitecoreVersion: 910XP1
-    InstallCommand: Install-Sitecore91
-  - SitecoreVersion: 911XM0
-    InstallCommand: Install-Sitecore91
-  - SitecoreVersion: 911XM1
-    InstallCommand: Install-Sitecore91
-  - SitecoreVersion: 911XP0
-    InstallCommand: Install-Sitecore91
-  - SitecoreVersion: 911XP1
-    InstallCommand: Install-Sitecore91
-  - SitecoreVersion: 920XM0
-    InstallCommand: Install-Sitecore92
-  - SitecoreVersion: 920XM1
-    InstallCommand: Install-Sitecore92
-  - SitecoreVersion: 920XP0
-    InstallCommand: Install-Sitecore92
-  - SitecoreVersion: 920XP1
-    InstallCommand: Install-Sitecore92
-  - SitecoreVersion: 930XM0
-    InstallCommand: Install-Sitecore93
-  - SitecoreVersion: 930XM1
-    InstallCommand: Install-Sitecore93
-  - SitecoreVersion: 930XP0
-    InstallCommand: Install-Sitecore93
-  - SitecoreVersion: 930XP1
-    InstallCommand: Install-Sitecore93
-    ShouldDeploy: True
+version: 1.0.{build}
+image: Visual Studio 2019
+configuration: Release
+shallow_clone: true
+clone_depth: 1
+test: off
 services:
 - iis
 - mssql2017
 build_script:
-- ps: >-
-    .\test.ps1 -Prefix appveyor `
-               -SitecoreVersion $Env:SitecoreVersion `
-               -DownloadBase $Env:DownloadBase `
-               -SqlAdminPassword 'Password12!' `
-               -InstallCommand $Env:InstallCommand
-
-deploy_script:
-- ps: .\deploy.ps1
+- ps: .\build.ps1 -DownloadBase $Env:DownloadBase -BizTalkAon $Env:BizTalkAon -BizTalkForms $Env:BizTalkForms -IakCfpPassword $Env:IakCfpPassword
+on_failure:
+- ps: '$blockRdp = $true; iex ((new-object net.webclient).DownloadString(''https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1''))'
