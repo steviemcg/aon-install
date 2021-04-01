@@ -10,3 +10,7 @@ Push-Location c:\redis-3.2.100
 .\redis-server.exe --service-start
 
 Pop-Location
+
+Import-Module "$PSScriptRoot\ParTech.SimpleInstallScripts.psd1" -Force
+Register-SitecoreGallery
+Install-SitecoreInstallFramework
