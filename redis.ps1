@@ -4,7 +4,9 @@ $destination="c:\redisarchive"
 Invoke-WebRequest $source -OutFile $destination
 [IO.Compression.ZipFile]::ExtractToDirectory('c:\redisarchive', 'c:\redis-3.2.100')
 
-cd c:\redis-3.2.100
+Push-Location c:\redis-3.2.100
+
 .\redis-server.exe --service-install
 .\redis-server.exe --service-start
-cd ..
+
+Pop-Location
