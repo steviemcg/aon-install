@@ -14,7 +14,7 @@
             "Type": "string",
             "Description": "The path to the DevSettings file. (currently used for Unicorn)",
 			"DefaultValue": ".\\DevSettings.config"
-        },		
+        },
         "SqlDbPrefix": {
             "Type": "string",
             "Description": "The prefix used for all Sql databases.",

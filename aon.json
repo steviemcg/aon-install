@@ -565,6 +565,9 @@
 
     },
     "Includes": {
+		"SxaSolr": {
+			"Source": "C:\\eglobal_au\\Dev\\aon-install\\sxa-solr.json"
+		},	
         "IdentityServerCertificates":{
             "Source": ".\\createcert.json"
         },

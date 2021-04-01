@@ -19,7 +19,9 @@ $FrontendSitecoreBuild = "1.1.0-281"
 $packages = @(
     "Sitecore JavaScript Services Server for Sitecore 9.1 XP 11.0.0 rev. 181031.zip"
     "Sitecore.PowerShell.Extensions-6.2.zip"
-	"Templates backup 2021-03-31.zip"
+	"Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.zip"
+	"SXA Solr Cores.zip"
+	"Templates backup 2021-03-31a.zip"
     "Content backup 2021-03-31.zip"
     "Media backup 2021-03-31.zip"
 )
@@ -69,7 +71,6 @@ Write-Host "================= Installing ParTech.SimpleInstallScripts ==========
 
 Invoke-SetXmlTask -FilePath $DevSettingsFile -XPath "//sitecore/sc.variable[@name='sourceFolder']" -Attributes @{value=$sourceFolder}
 
-# path sxa cores
 # publishingsettings.targets.user
 
 Install-Sitecore91 -Prefix $prefix `
