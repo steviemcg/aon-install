@@ -11,6 +11,8 @@ Push-Location c:\redis-3.2.100
 
 Pop-Location
 
+New-Item -ItemType Directory C:\downloads\910XP0
+
 Import-Module "$PSScriptRoot\ParTech.SimpleInstallScripts.psd1" -Force
 Register-SitecoreGallery
 Install-SitecoreInstallFramework
