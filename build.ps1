@@ -31,6 +31,9 @@ $zips = @(
 	"razl.zip"
 )
 		
+Write-Host "================= Installing ParTech.SimpleInstallScripts =================" -foregroundcolor Magenta
+Import-Module "$PSScriptRoot\ParTech.SimpleInstallScripts.psd1" -Force
+
 Write-Host "================= Downloading files =================" -foregroundcolor Magenta
 $filesToDownload = $packages + $zips + @("cfpa.sitecore.react.$($SitecoreBuild).zip", "XConnectFiles.zip", "aon-front-end-sitecore.$($FrontendSitecoreBuild).tgz", "cfpa.sitecore.dotnet.$($SitecoreBuild).zip")
 
@@ -65,9 +68,6 @@ Import-Certificate -FilePath "$PSScriptRoot\NAM-qc.cer" -CertStoreLocation Cert:
 
 $IakCfpPasswordSecure = ConvertTo-SecureString $IakCfpPassword -AsPlainText -Force
 Import-PfxCertificate -FilePath "$PSScriptRoot\iakcfp.pfx" -CertStoreLocation Cert:\LocalMachine\My -Password $IakCfpPasswordSecure
-
-Write-Host "================= Installing ParTech.SimpleInstallScripts =================" -foregroundcolor Magenta
-Import-Module "$PSScriptRoot\ParTech.SimpleInstallScripts.psd1" -Force
 
 Invoke-SetXmlTask -FilePath $DevSettingsFile -XPath "//sitecore/sc.variable[@name='sourceFolder']" -Attributes @{value=$sourceFolder}
 
