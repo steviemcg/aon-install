@@ -7,7 +7,10 @@ test: off
 services:
 - iis
 - mssql2017
-- redis
+before_build:
+- choco install redis-64
+- redis-server --service-install
+- redis-server --service-start
 build_script:
 - ps: .\build.ps1 -DownloadBase $Env:DownloadBase -BizTalkAon $Env:BizTalkAon -BizTalkForms $Env:BizTalkForms -IakCfpPassword $Env:IakCfpPassword
 on_failure:
