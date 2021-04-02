@@ -9,11 +9,9 @@ services:
 - mssql2017
 before_build:
 - ps: >-
-    .\redis.ps1
+    & .\redis.ps1
 
-
-
-    .\prereqs.ps1 `
+    & .\prereqs.ps1 `
 
         -DownloadBase $Env:DownloadBase `
 
