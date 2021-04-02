@@ -7,9 +7,9 @@ param(
     [Parameter(Mandatory)] [string] $SqlServer,
     [Parameter(Mandatory)] [string] $SqlAdminUser,
     [Parameter(Mandatory)] [string] $SqlAdminPassword,
-	[Parameter(Mandatory)] [string] $IakCfpPassword,
-    [string] $SifVersion    
-) 
+    [Parameter(Mandatory)] [string] $IakCfpPassword,
+    [string] $SifVersion
+)
 
 Write-Host "================= Enabling IIS features =================" -foregroundcolor Magenta
 #Enable-WindowsOptionalFeature -featurename IIS-WebServerRole -all -online
