@@ -77,7 +77,7 @@ Install-Sitecore91 -Prefix $prefix `
                 -Zips $zips `
                 -ConnectionStrings $ConnectionStrings `
                 -DoUninstall:$false `
-                -DoInstallPrerequisites:$true `
+                -DoInstallPrerequisites:$false `
                 -DoSitecorePublish:$false `
                 -DoRebuildLinkDatabases:$true `
                 -DoRebuildSearchIndexes:$true `
