@@ -11,9 +11,7 @@ before_build:
 - ps: >-
     & .\redis.ps1
 
-    & .\prereqs.ps1 `
-
-        -DownloadBase $Env:DownloadBase `
+    & .\prereqs.ps1 -DownloadBase $Env:DownloadBase `
 
         -InstallRoot "c:\downloads\910xp0" `
         
