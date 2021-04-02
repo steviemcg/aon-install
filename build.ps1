@@ -1,8 +1,10 @@
 param(
     [Parameter(Mandatory)] [string] $DownloadBase,
-	[Parameter(Mandatory)] [string] $BizTalkAon,
-	[Parameter(Mandatory)] [string] $BizTalkForms,
-	[Parameter(Mandatory)] [string] $IakCfpPassword
+    [Parameter(Mandatory)] [string] $BizTalkAon,
+    [Parameter(Mandatory)] [string] $BizTalkForms,
+    [Parameter(Mandatory)] [string] $SqlServer
+    [Parameter(Mandatory)] [string] $SqlAdminUser,
+    [Parameter(Mandatory)] [string] $SqlAdminPassword
 )
 
 $ErrorActionPreference = "Stop"
@@ -19,18 +21,18 @@ $FrontendSitecoreBuild = "1.1.0-281"
 $packages = @(
     "Sitecore JavaScript Services Server for Sitecore 9.1 XP 11.0.0 rev. 181031.zip"
     "Sitecore.PowerShell.Extensions-6.2.zip"
-	"Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.zip"
-	"SXA Solr Cores.zip"
-	"Templates backup 2021-03-31a.zip"
+    "Sitecore Experience Accelerator 1.8 rev. 181112 for 9.1.zip"
+    "SXA Solr Cores.zip"
+    "Templates backup 2021-03-31a.zip"
     "Content backup 2021-03-31.zip"
     "Media backup 2021-03-31.zip"
 )
 
 $zips = @(
     "9.1.0 Hotfixes.zip"
-	"razl.zip"
+    "razl.zip"
 )
-		
+
 Write-Host "================= Installing ParTech.SimpleInstallScripts =================" -foregroundcolor Magenta
 Import-Module "$PSScriptRoot\ParTech.SimpleInstallScripts.psd1" -Force
 
@@ -38,10 +40,10 @@ Write-Host "================= Downloading files =================" -foregroundco
 $filesToDownload = $packages + $zips + @("cfpa.sitecore.react.$($SitecoreBuild).zip", "XConnectFiles.zip", "aon-front-end-sitecore.$($FrontendSitecoreBuild).tgz", "cfpa.sitecore.dotnet.$($SitecoreBuild).zip")
 
 foreach ($fileName in $filesToDownload) {
-	Write-Host "================= Downloading $fileName =================" -foregroundcolor Yellow
-	$FileUrl = "$DownloadBase/$fileName"
-	$FilePath = "$($installRoot)\$fileName"
-	Invoke-DownloadIfNeeded $FileUrl $FilePath
+    Write-Host "================= Downloading $fileName =================" -foregroundcolor Yellow
+    $FileUrl = "$DownloadBase/$fileName"
+    $FilePath = "$($installRoot)\$fileName"
+    Invoke-DownloadIfNeeded $FileUrl $FilePath
 }
 
 $ConnectionStrings = @{
@@ -59,16 +61,6 @@ if (-Not $redis.TcpTestSucceeded) {
     throw "Please install Redis first. G:\ECOMM.AFD\CFP\Developer Workstation Tools"
 }
 
-Write-Host "================= Enabling IIS features =================" -foregroundcolor Magenta
-#Enable-WindowsOptionalFeature -featurename IIS-WebServerRole -all -online
-
-Write-Host "================= Installing SSL certificates =================" -foregroundcolor Magenta
-Import-Certificate -FilePath "$PSScriptRoot\OneGini-TST.cer" -CertStoreLocation Cert:\LocalMachine\My
-Import-Certificate -FilePath "$PSScriptRoot\NAM-qc.cer" -CertStoreLocation Cert:\LocalMachine\My
-
-$IakCfpPasswordSecure = ConvertTo-SecureString $IakCfpPassword -AsPlainText -Force
-Import-PfxCertificate -FilePath "$PSScriptRoot\iakcfp.pfx" -CertStoreLocation Cert:\LocalMachine\My -Password $IakCfpPasswordSecure
-
 Invoke-SetXmlTask -FilePath $DevSettingsFile -XPath "//sitecore/sc.variable[@name='sourceFolder']" -Attributes @{value=$sourceFolder}
 
 # TODO: publishingsettings.targets.user
@@ -77,9 +69,9 @@ Install-Sitecore91 -Prefix $prefix `
                 -Parameters @{Path=".\\aon.json"; SitecoreSiteName="$prefix.local"; SitecorePath=$SitecorePath; SitecoreSchema="https"; DevSettingsFile=$DevSettingsFile; InstallRoot=$installRoot } `
                 -SitecoreVersion 910XP0 `
                 -DownloadBase $DownloadBase `
-                -SqlServer . `
-                -SqlAdminUser sa `
-                -SqlAdminPassword 'Blank123' `
+                -SqlServer $SqlServer `
+                -SqlAdminUser $SqlAdminUser `
+                -SqlAdminPassword $SqlAdminPassword `
                 -SitecoreAdminPassword b `
                 -Packages $packages `
                 -Zips $zips `
