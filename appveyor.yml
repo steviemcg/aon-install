@@ -13,6 +13,6 @@ before_build:
 
     & .\prereqs.ps1 -DownloadBase $Env:DownloadBase -InstallRoot "c:\downloads\910xp0" -IakCfpPassword $Env:IakCfpPassword -SqlServer . -SqlAdminUser sa -SqlAdminPassword 'Password12!' -SolrVersion '7.2.1' -SolrHost 'localhost' -SolrPort 8983
 build_script:
-- ps: .\build.ps1 -DownloadBase $Env:DownloadBase -BizTalkAon $Env:BizTalkAon -BizTalkForms $Env:BizTalkForms -IakCfpPassword $Env:IakCfpPassword -SqlServer . -SqlAdminUser sa -SqlAdminPassword 'Password12!'
+- ps: .\build.ps1 -DownloadBase $Env:DownloadBase -BizTalkAon $Env:BizTalkAon -BizTalkForms $Env:BizTalkForms -SqlServer . -SqlAdminUser sa -SqlAdminPassword 'Password12!'
 on_failure:
 - ps: '$blockRdp = $true; iex ((new-object net.webclient).DownloadString(''https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1''))'
