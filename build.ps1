@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory)] [string] $DownloadBase,
     [Parameter(Mandatory)] [string] $BizTalkAon,
     [Parameter(Mandatory)] [string] $BizTalkForms,
-    [Parameter(Mandatory)] [string] $SqlServer
+    [Parameter(Mandatory)] [string] $SqlServer,
     [Parameter(Mandatory)] [string] $SqlAdminUser,
     [Parameter(Mandatory)] [string] $SqlAdminPassword
 )

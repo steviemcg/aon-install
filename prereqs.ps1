@@ -24,7 +24,7 @@ Register-SitecoreGallery
 Install-SitecoreInstallFramework
 
 Invoke-CommandWithEffectiveParameters "Install-Solr" $PSBoundParameters
-Install-SifPrerequisites -InstallRoot $InstallRoot
+Install-SifPrerequisites -InstallRoot $PSScriptRoot
 
 Write-Host "================= Installing SSL certificates =================" -foregroundcolor Magenta
 Import-Certificate -FilePath "$PSScriptRoot\OneGini-TST.cer" -CertStoreLocation Cert:\LocalMachine\My
